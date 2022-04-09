@@ -62,5 +62,69 @@ function load_mailbox(mailbox) {
   document.querySelector('#compose-view').style.display = 'none';
 
   // Show the mailbox name
-  document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+  document.querySelector('#emails-view').innerHTML = 
+    `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>
+    <div class="email-row email-heading">
+      <div class="sender">Sender</div>
+      <div class="subject">Subject</div>
+      <div class="timestamp">Timestamp</div>
+    </div>`;
+
+  // Fetch emails from API and display the emails
+  fetch(`/emails/${mailbox}`)
+  .then(response => response.json())
+  .then(emails => {
+    console.log(emails);
+
+    // If no emails returned
+    if (emails.length == 0) {
+      // Display a message
+      const message = document.createElement('div');
+      message.innerHTML = 'No emails to display.'
+      message.style.textAlign = 'center';
+      document.getElementById('emails-view').appendChild(message);
+    }
+
+    // Display the emails
+    emails.forEach( email => {
+      addEmailToView(email);
+    })
+  })
+  .catch(err => {
+    console.log(err);
+  });
+
 }
+
+// Add an email object to a mailbox view
+function addEmailToView(email) {
+  const parentView = document.getElementById('emails-view');
+
+  // Create HTML elements from the email data
+  const container = document.createElement('div');
+  if (email.read) {
+    // If email has been read, add a new class to the container for read email
+    container.className = 'email-row read';
+  } else {
+    container.className = 'email-row';
+  }
+  container.id = email.id;
+
+  const senderDiv = document.createElement('div');
+  senderDiv.className = 'sender';
+  senderDiv.innerHTML = email.sender;
+  const subjectDiv = document.createElement('div');
+  subjectDiv.className = 'subject';
+  subjectDiv.innerHTML = email.subject;
+  const timestampDiv = document.createElement('div');
+  timestampDiv.className = 'timestamp';
+  timestampDiv.innerHTML = email.timestamp;
+
+  container.appendChild(senderDiv);
+  container.appendChild(subjectDiv);
+  container.appendChild(timestampDiv);
+
+  parentView.appendChild(container);
+}
+
+// View a speicific email
