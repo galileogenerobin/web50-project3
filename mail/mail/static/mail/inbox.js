@@ -8,6 +8,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // By default, load the inbox
   load_mailbox('inbox');
+
+  // When the compose-form is submitted
+  document.getElementById('compose-form').onsubmit = function() {
+    
+    // Grab the email values
+    recipients = document.getElementById('compose-recipients').value;
+    subject = document.getElementById('compose-subject').value;
+    body = document.getElementById('compose-body').value;
+    
+    // Submit a POST request to the '/emails' path (corresponding to compose in our views.py)
+    fetch('/emails', {
+      method: 'POST',
+      body: JSON.stringify({
+        recipients: recipients,
+        subject: subject, 
+        body: body
+      })
+    })
+    .then(response => response.json())
+    .then(result => {
+      console.log(result);
+    })
+    .catch(err => {
+      console.log(err);
+    })
+
+    // Go to the sent mailbox
+    load_mailbox('sent');
+
+    // Don't submit the form; we are processing the POST request with our fetch function above
+    return false;
+  };
+
 });
 
 function compose_email() {
