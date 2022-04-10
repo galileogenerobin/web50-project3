@@ -12,14 +12,14 @@ textarea {
     border-left: none;
     border-right: none;
 }
-.email-row:not(.email-heading) {
+.email-row:not(.email-heading-inbox) {
     cursor: pointer;
 }
-.email-row:not(.email-heading):hover {
-    background-color: #eeeaea;
+.email-row:not(.email-heading-inbox):hover {
+    background-color: #dddddd;
     transition: background-color 0.2s ease-in-out;
 }
-.email-heading {
+.email-heading-inbox {
     border: none;
     font-weight: bold;
     color: #555;
@@ -27,17 +27,29 @@ textarea {
 .read {
     background-color: #efefef;
 }
-.sender {
+.sender-inbox {
     font-weight: bold;
     margin: 0px 8px 0px 0px;
     width: 240px;
 }
-.subject {
+.subject-inbox {
     flex-grow: 1;
     margin: 0px 8px;
 }
-.timestamp {
+.timestamp-inbox {
     margin: 0px 0px 0px 8px;
     width: 240px;
     text-align: right;
+}
+
+.email-container {
+    display: flex;
+    flex-direction: column;
+}
+.email-body {
+    margin: 16px 0px;
+    padding: 16px 0px;
+    border-top: 1px solid #ddd;
+    /* Setting white space to pre-wrap to preserve new lines and tabs in the email */
+    white-space: pre-wrap;
 }
