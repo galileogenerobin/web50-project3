@@ -169,6 +169,11 @@ function viewEmail(id) {
     document.getElementById('subject').innerHTML = `<strong>Subject:</strong> ${email.subject}`;
     document.getElementById('timestamp').innerHTML = `<strong>Sent:</strong> ${email.timestamp}`;
 
+    // Assign the click handler to the reply button
+    document.getElementById('reply-btn').onclick = () => {
+      replyToEmail(email);
+    }
+
     // Archive or Unarchive button
     const currentUser = document.getElementById('user-email').innerHTML;
     const archiveBtn = document.getElementById('archive-btn');
@@ -202,4 +207,23 @@ function changeArchiveStatus(email) {
 
   // Reload the page (which redirects to the inbox)
   location.reload();
+}
+
+// Reply to an email
+function replyToEmail(email) {
+  // Change to the compose email view
+  compose_email();
+
+  // Pre-fill the recipient, subject and body elements
+  document.getElementById('compose-recipients').value = email.sender;
+
+  // Update the email subject as needed
+  // Check the first three characters of the subject
+  let newSubject = email.subject;
+  if (!(email.subject.substring(0, 3) == 'Re:')) {
+    newSubject = 'Re: ' + newSubject;
+  }
+
+  document.getElementById('compose-subject').value = newSubject;
+  document.getElementById('compose-body').value = `On ${email.timestamp} ${email.sender} wrote: \n${email.body}\n---------------------------------------------------------------\n`;
 }
