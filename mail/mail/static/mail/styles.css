@@ -67,3 +67,12 @@ textarea {
     /* Setting white space to pre-wrap to preserve new lines and tabs in the email */
     white-space: pre-wrap;
 }
+
+#send-button-container {
+    display: flex;
+    justify-content: flex-end;
+}
+#send-email {
+    margin: 8px 0px 8px 0px;
+    width: 200px;
+}

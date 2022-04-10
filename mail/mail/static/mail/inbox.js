@@ -9,11 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // By default, load the inbox
   load_mailbox('inbox');
-
-  // When the compose-form is submitted
-  document.getElementById('compose-form').onsubmit = function() {
-    send_email();
-  };
 });
 
 function compose_email() {
@@ -27,6 +22,11 @@ function compose_email() {
   document.querySelector('#compose-recipients').value = '';
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
+
+  // When the send-email button is clicked; we changed the button type from 'submit' to 'button' so we don't have to handle form submission
+  document.getElementById('send-email').onclick = () => {
+    send_email();
+  };
 }
 
 function send_email() {
@@ -52,15 +52,8 @@ function send_email() {
     console.log(err);
   })
 
-  console.log('email sent. redirecting to sent mailbox')
   // Go to the sent mailbox
   load_mailbox('sent');
-  console.log('redirected to sent mailbox');
-
-  // TODO: Check why the page redirects to inbox instead of sent
-
-  // Don't submit the form; we are processing the POST request with our fetch function above
-  return false;
 }
 
 function load_mailbox(mailbox) {
@@ -141,7 +134,6 @@ function viewEmail(id) {
   fetch(`/emails/${id}`)
   .then(response => response.json())
   .then(email => {
-    console.log(email);
     // Display the email contents in the page
     display(email);
 
@@ -225,5 +217,5 @@ function replyToEmail(email) {
   }
 
   document.getElementById('compose-subject').value = newSubject;
-  document.getElementById('compose-body').value = `On ${email.timestamp} ${email.sender} wrote: \n${email.body}\n---------------------------------------------------------------\n`;
+  document.getElementById('compose-body').value = `\n---------------------------------------------------------------\nOn ${email.timestamp} ${email.sender} wrote: \n${email.body}`;
 }
