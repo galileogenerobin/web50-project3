@@ -9,6 +9,7 @@ textarea {
     justify-content: space-between;
     padding: 8px;
     border: 1px solid #aaa;
+    border-top: none;
     border-left: none;
     border-right: none;
 }
@@ -20,7 +21,6 @@ textarea {
     transition: background-color 0.2s ease-in-out;
 }
 .email-heading-inbox {
-    border: none;
     font-weight: bold;
     color: #555;
 }
@@ -42,11 +42,25 @@ textarea {
     text-align: right;
 }
 
-.email-container {
+#view-email-container {
     display: flex;
     flex-direction: column;
 }
-.email-body {
+#meta-last-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+#email-buttons-container {
+    display: flex;
+    justify-content: end;
+    flex-direction: row;
+}
+.email-btn {
+    margin-left: 8px;
+    width: 80px;
+}
+#email-body {
     margin: 16px 0px;
     padding: 16px 0px;
     border-top: 1px solid #ddd;

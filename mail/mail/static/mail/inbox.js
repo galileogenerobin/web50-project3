@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('Page loaded')
 
   // Use buttons to toggle between views
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
@@ -20,6 +21,7 @@ function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
+  document.getElementById('view-email-container').style.display = 'none';
 
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
@@ -50,8 +52,10 @@ function send_email() {
     console.log(err);
   })
 
+  console.log('email sent. redirecting to sent mailbox')
   // Go to the sent mailbox
   load_mailbox('sent');
+  console.log('redirected to sent mailbox');
 
   // TODO: Check why the page redirects to inbox instead of sent
 
@@ -64,6 +68,7 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.getElementById('view-email-container').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = 
@@ -78,14 +83,13 @@ function load_mailbox(mailbox) {
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => {
-    // console.log(emails);
-
     // If no emails returned
     if (emails.length == 0) {
       // Display a message
       const message = document.createElement('div');
       message.innerHTML = 'No emails to display.'
       message.style.textAlign = 'center';
+      message.className = 'mt-2'
       document.getElementById('emails-view').appendChild(message);
     }
 
@@ -104,12 +108,8 @@ function addEmailToView(email) {
 
   // Create HTML elements from the email data
   const container = document.createElement('div');
-  if (email.read) {
-    // If email has been read, add a new class to the container for read email
-    container.className = 'email-row read';
-  } else {
-    container.className = 'email-row';
-  }
+  // If email has been read, add a new class to the container for read email
+  container.className = email.read ? 'email-row read' : 'email-row';
   // Set the containers id equal to the email id so we can grab this value when needed
   container.id = email.id;
 
@@ -137,8 +137,6 @@ function addEmailToView(email) {
 
 // View a specific email
 function viewEmail(id) {
-  const parentView = document.getElementById('emails-view');
-
   // Get the email contents
   fetch(`/emails/${id}`)
   .then(response => response.json())
@@ -160,33 +158,48 @@ function viewEmail(id) {
 
   // Display email contents in the page
   function display(email) {
-    // Creating a container div for the email contents
-    const emailView = document.createElement('div');
-    emailView.className = 'email-container';
+    // Show the view-email-container and hide the other containers
+    document.getElementById('view-email-container').style.display = 'block';
+    document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#compose-view').style.display = 'none';
     
     // Parsing the contents of the email into individual elements
-    // Starting with the email's metadata, we create an Array of the innerHTML values for sender, recipients, email and subject
-    const emailMeta = [
-      `<strong>From:</strong> ${email.sender}`,
-      `<strong>To:</strong> ${email.recipients.join(", ")}`,
-      `<strong>Subject:</strong> ${email.subject}`,
-      `<strong>Sent:</strong> ${email.timestamp}`
-    ]
+    document.getElementById('from').innerHTML = `<strong>From:</strong> ${email.sender}`;
+    document.getElementById('to').innerHTML = `<strong>To:</strong> ${email.recipients.join(", ")}`;
+    document.getElementById('subject').innerHTML = `<strong>Subject:</strong> ${email.subject}`;
+    document.getElementById('timestamp').innerHTML = `<strong>Sent:</strong> ${email.timestamp}`;
 
-    // Creating new divs for each item above
-    for (value of emailMeta) {
-      const div = document.createElement('div');
-      div.innerHTML = value;
-      emailView.appendChild(div);
+    // Archive or Unarchive button
+    const currentUser = document.getElementById('user-email').innerHTML;
+    const archiveBtn = document.getElementById('archive-btn');
+    // If from 'Sent' mailbox, archive or unarchive does not apply; we do this by checking whether the current user = the email's sender
+    archiveBtn.style.display = currentUser == email.sender ? 'none' : 'block';
+    // Further, if email is already archived, the button should say 'Unarchived'
+    archiveBtn.innerHTML = email.archived ? 'Unarchive' : 'Archive';
+    // Assign the click handler
+    archiveBtn.onclick = () => {
+      changeArchiveStatus(email);
     }
-    const bodyDiv = document.createElement('p');
-    bodyDiv.innerHTML = email.body;
-    console.log(email.body);
-    bodyDiv.className = 'email-body';
-    emailView.append(bodyDiv);
 
-    // Clear the parent view (i.e. the inbox div) before adding our emailView
-    parentView.innerHTML = '';
-    parentView.appendChild(emailView);
+    // Body of the email
+    document.getElementById('email-body').innerHTML = email.body;
   }
+}
+
+// Archive or unarchive an email
+function changeArchiveStatus(email) {
+  // Submit a PUT request to change the archive status
+  fetch(`/emails/${email.id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      // If email is archived, changed to unarchived and vice versa
+      archived: email.archived ? false : true
+    })
+  })
+  .then(response => {
+    console.log(response);
+  })
+
+  // Reload the page (which redirects to the inbox)
+  location.reload();
 }
