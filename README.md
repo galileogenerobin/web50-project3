@@ -1,7 +1,7 @@
 # web50-project3
 ## CS50 Web - Project 3 - Mail
 
-Demo of completed project here: *To be updated*
+Demo of completed project here: https://youtu.be/53bzM8FdSiA
 
 ## Specifications:
 

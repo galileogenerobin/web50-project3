@@ -47,13 +47,12 @@ function send_email() {
   .then(response => response.json())
   .then(result => {
     console.log(result);
+    // Go to the sent mailbox
+    load_mailbox('sent');
   })
   .catch(err => {
     console.log(err);
   })
-
-  // Go to the sent mailbox
-  load_mailbox('sent');
 }
 
 function load_mailbox(mailbox) {
@@ -84,12 +83,12 @@ function load_mailbox(mailbox) {
       message.style.textAlign = 'center';
       message.className = 'mt-2'
       document.getElementById('emails-view').appendChild(message);
+    } else {
+      // Display the emails
+      emails.forEach( email => {
+        addEmailToView(email);
+      })
     }
-
-    // Display the emails
-    emails.forEach( email => {
-      addEmailToView(email);
-    })
   })
   .catch(err => {console.log(err)});
 
@@ -215,7 +214,7 @@ function replyToEmail(email) {
   if (!(email.subject.substring(0, 3) == 'Re:')) {
     newSubject = 'Re: ' + newSubject;
   }
-
+  // Pre-fill the email subject and email body
   document.getElementById('compose-subject').value = newSubject;
   document.getElementById('compose-body').value = `\n---------------------------------------------------------------\nOn ${email.timestamp} ${email.sender} wrote: \n${email.body}`;
 }
